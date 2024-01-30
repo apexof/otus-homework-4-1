@@ -1,19 +1,26 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.23;
 
-import {IERC20, IERC20Errors} from '../../interfaces/ERC20/IERC20.sol';
+import {IERC20Metadata, IERC20Errors} from '../../interfaces/ERC20/IERC20.sol';
 
-contract ERC20Token is IERC20, IERC20Errors {
-  uint256 public totalSupply;
+contract ERC20Token is IERC20Metadata, IERC20Errors {
   address private owner;
+
+  uint256 public totalSupply;
+
+  string public name;
+  string public symbol;
+  uint8 public decimals = 18;
 
   mapping(address account => uint256 balance) public balanceOf;
   mapping(address owner => mapping(address spender => uint256 value)) public allowance;
 
-  constructor (uint256 _totalSupply) {
+  constructor (string memory _name, string memory _symbol, uint256 _totalSupply) {
     owner = msg.sender;
-    totalSupply = _totalSupply;
-    balanceOf[owner] = _totalSupply;
+    name = _name;
+    symbol = _symbol;
+
+    mint(_totalSupply);
   }
 
   function approve(address spender, uint256 value) external returns (bool){
@@ -23,16 +30,21 @@ contract ERC20Token is IERC20, IERC20Errors {
   }
 
   function transfer(address to, uint256 value) external returns (bool){
-    uint256 senderBalance = balanceOf[msg.sender];
+    address sender = msg.sender;
+    uint256 senderBalance = balanceOf[sender];
+
     if(value > senderBalance){
-      revert ERC20InsufficientBalance(msg.sender, senderBalance, value);
+      revert ERC20InsufficientBalance(sender, senderBalance, value);
     }
-    balanceOf[msg.sender] -= value;
+
+    balanceOf[sender] -= value;
     balanceOf[to] += value;
+
     if(to == address(0)){
-      totalSupply -= value;
+      revert ERC20InvalidReceiver(to);
     }
-    emit Transfer(msg.sender, to, value);
+
+    emit Transfer(sender, to, value);
 
     return true;
   }
@@ -40,18 +52,22 @@ contract ERC20Token is IERC20, IERC20Errors {
   function transferFrom(address from, address to, uint256 value) external returns (bool){
     address spender = msg.sender;
     uint _allowance = allowance[from][spender];
+
     if(value > _allowance){
       revert ERC20InsufficientAllowance(spender, _allowance, value);
     }
     if(value > balanceOf[from]){
       revert ERC20InsufficientBalance(from, balanceOf[from], value);
     }
+
     allowance[from][spender] -= value;
     balanceOf[from] -= value;
     balanceOf[to] += value;
+
     if(to == address(0)){
-      totalSupply -= value;
+      revert ERC20InvalidReceiver(to);
     }
+
     emit Transfer(from, to, value);
 
     return true;
@@ -69,7 +85,7 @@ contract ERC20Token is IERC20, IERC20Errors {
     emit Transfer(address(0), owner, value);
   }
 
-    function mint(uint256 value, address to) public onlyOwner {
+  function mint(uint256 value, address to) public onlyOwner {
     balanceOf[to] += value;
     totalSupply += value;
 
@@ -86,5 +102,7 @@ contract ERC20Token is IERC20, IERC20Errors {
 
     balanceOf[sender] -= value;
     totalSupply -= value;
+
+    emit Transfer(sender, address(0), value);
   }
 }

@@ -12,7 +12,7 @@ describe("ERC20", function() {
     const [user1, user2] = await ethers.getSigners();
 
     const Factory = await ethers.getContractFactory("ERC20Token");
-    const contract = await Factory.deploy(totalSupplyDefault);
+    const contract = await Factory.deploy("TestToken", "TST", totalSupplyDefault);
     await contract.waitForDeployment();
 
     return { user1, user2, contract }
@@ -22,12 +22,14 @@ describe("ERC20", function() {
     const { contract } = await loadFixture(deploy);
     expect(contract.target).to.be.properAddress;
   })
+  // default total supply
   it(`totalSupply should be ${totalSupplyDefault} by default`, async function() {
     const { contract } = await loadFixture(deploy);
     const totalSupply = await contract.totalSupply();
 
     expect(totalSupply).to.eq(totalSupplyDefault);
   })
+  // transfer
   it(`Should correctly transfer tokens and update balances`, async function() {
     const { contract, user2 } = await loadFixture(deploy);
     await contract.transfer(user2, amount);
@@ -42,17 +44,7 @@ describe("ERC20", function() {
 
     await expect(tx).to.be.revertedWithCustomError(contract,"ERC20InsufficientBalance").withArgs(user2.address, user2Balance, amount);
   })
-  it(`Should correct burn tokens`, async function() {
-    const { contract, user1 } = await loadFixture(deploy);
-
-    // user balance
-    const tx = contract.transfer(ethers.ZeroAddress, amount);
-    await expect(tx).to.changeTokenBalance(contract,user1, -amount)
-
-    //totalSupply
-    const totalSupply = await contract.totalSupply();
-    expect(totalSupply).to.eq(totalSupplyDefault - 1); 
-  })
+  // approve
   it(`Should correct approve tokens`, async function() {
     const { contract, user1,user2 } = await loadFixture(deploy);
 
@@ -66,6 +58,7 @@ describe("ERC20", function() {
     const allowanceAfter = await contract.allowance(user1,user2)
     expect(allowanceAfter).to.eq(1); 
   })
+  // transferFrom
   it(`Should fail if sender doesn’t have enough allowance for transferFrom tokens`, async function() {
     const { contract, user2, user1 } = await loadFixture(deploy);
     const tx = contract.transferFrom(user2, user1, amount)
@@ -91,17 +84,42 @@ describe("ERC20", function() {
   // mint
   it(`Should correctly mint new tokens`, async function() {
     const { contract, user1 } = await loadFixture(deploy);
-    const newAmount = 30
-    const tx = contract.mint(newAmount)
-    await expect(tx).to.be.changeTokenBalance(contract, user1, newAmount)
+    const tx = contract["mint(uint256)"](amount)
+    await expect(tx).to.be.changeTokenBalance(contract, user1, amount)
     const totalSupply = await contract.totalSupply()
 
-    expect(totalSupply).to.be.eq(newAmount + totalSupplyDefault)
+    expect(totalSupply).to.be.eq(amount + totalSupplyDefault)
   })
   it(`Only owner can mint new tokens`, async function() {
     const { contract, user1, user2 } = await loadFixture(deploy);
-    const tx = contract.connect(user2).mint(1)
+    const tx = contract.connect(user2)["mint(uint256)"](1)
 
     await expect(tx).to.be.revertedWith('Only owner can do this!')
+  })
+  it(`Should correctly mint new tokens to another address`, async function() {
+    const { contract, user1, user2 } = await loadFixture(deploy);
+
+    const tx = contract["mint(uint256,address)"](amount, user2)
+
+    await expect(tx).to.be.changeTokenBalance(contract, user2, amount)
+    const totalSupply = await contract.totalSupply()
+
+    expect(totalSupply).to.be.eq(amount + totalSupplyDefault)
+  })
+  // burn
+  it(`Should correct burn tokens`, async function() {
+    const { contract, user1 } = await loadFixture(deploy);
+
+    const tx = contract.burn(amount)
+
+    // emit Transfer
+    await expect(tx).to.emit(contract, "Transfer").withArgs(user1, ethers.ZeroAddress, amount);
+    
+    // changeTokenBalance
+    await expect(() => tx).to.changeTokenBalance(contract, user1,  -amount)
+
+    //totalSupply
+    const totalSupply = await contract.totalSupply();
+    expect(totalSupply).to.eq(totalSupplyDefault - amount); 
   })
 });

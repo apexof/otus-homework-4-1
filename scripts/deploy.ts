@@ -1,22 +1,15 @@
 import { ethers } from "hardhat";
+// import { ERC20Token } from "../typechain-types/contracts/ERC20.sol";
+// import { ERC20Token } from "../typechain-types";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const MyContract = await ethers.getContractFactory("ERC20Token");
+  const myContract = await MyContract.deploy('Apexof', 'APEX', 10);
 
-  const lockedAmount = ethers.parseEther("0.001");
+  await myContract.waitForDeployment();
+  const address = await myContract.getAddress()
 
-  const lock = await ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
-
-  await lock.waitForDeployment();
-
-  console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
-  );
+  console.log("MyContract deployed to:", address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
