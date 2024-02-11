@@ -3,13 +3,13 @@ import { ethers } from "hardhat";
 // import { ERC20Token } from "../typechain-types";
 
 async function main() {
-  const MyContract = await ethers.getContractFactory("ERC20Token");
-  const myContract = await MyContract.deploy('Apexof', 'APEX', 10);
+  const contractFactory = await ethers.getContractFactory("Bank");
+  const contract = await contractFactory.deploy();
 
-  await myContract.waitForDeployment();
-  const address = await myContract.getAddress()
+  await contract.waitForDeployment();
+  const address = await contract.getAddress()
 
-  console.log("MyContract deployed to:", address);
+  console.log("Contract deployed to:", address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -10,7 +10,7 @@ interface INativeBank {
     function withdraw(uint256 amount) external;
 }
 
-contract Bank is INativeBank {
+contract BankOld is INativeBank {
     mapping(address account => uint256 balance) public balanceOf;
 
     function deposit() public payable {

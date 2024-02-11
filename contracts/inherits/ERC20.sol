@@ -4,13 +4,13 @@ pragma solidity 0.8.23;
 import {IERC20Metadata, IERC20Errors} from '../../interfaces/ERC20/IERC20.sol';
 
 contract ERC20Token is IERC20Metadata, IERC20Errors {
-  address private owner;
+  address private immutable owner;
 
   uint256 public totalSupply;
 
   string public name;
   string public symbol;
-  uint8 public decimals = 18;
+  uint8 public constant decimals = 18;
 
   mapping(address account => uint256 balance) public balanceOf;
   mapping(address owner => mapping(address spender => uint256 value)) public allowance;
@@ -52,12 +52,13 @@ contract ERC20Token is IERC20Metadata, IERC20Errors {
   function transferFrom(address from, address to, uint256 value) external returns (bool){
     address spender = msg.sender;
     uint _allowance = allowance[from][spender];
+    uint balanceFrom = balanceOf[from];
 
     if(value > _allowance){
       revert ERC20InsufficientAllowance(spender, _allowance, value);
     }
-    if(value > balanceOf[from]){
-      revert ERC20InsufficientBalance(from, balanceOf[from], value);
+    if(value > balanceFrom){
+      revert ERC20InsufficientBalance(from, balanceFrom, value);
     }
 
     allowance[from][spender] -= value;

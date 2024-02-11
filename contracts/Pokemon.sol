@@ -9,9 +9,9 @@ contract Pokemon is ERC721, Ownable {
     uint256 private _nextTokenId;
     using Strings for uint256;
 
-    constructor(address initialOwner)
+    constructor()
         ERC721("Pokemon", "PKMN")
-        Ownable(initialOwner)
+        Ownable(msg.sender)
     {}
 
     function safeMint(address to) public onlyOwner {
