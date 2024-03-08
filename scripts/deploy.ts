@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 // import { ERC20Token } from "../typechain-types";
 
 async function main() {
-  const contractFactory = await ethers.getContractFactory("Bank");
+  const contractFactory = await ethers.getContractFactory("Perm");
   const contract = await contractFactory.deploy();
 
   await contract.waitForDeployment();
