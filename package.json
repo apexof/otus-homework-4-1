@@ -8,8 +8,8 @@
     "test": "npx hardhat test",
     "server": "npx hardhat node",
     "watch": "nodemon --watch contracts --ext sol --exec 'npm run compile'",
-    "deploy": "npx hardhat run ./scripts/deploy.ts --network sepolia",
-    "verify": "npx hardhat verify --network sepolia 0x7c0C4ad2875Ac932D1070666ABb62b0066ef4BB6"
+    "deploy": "npx hardhat run ./scripts/deploy.ts --network polygon_mumbai",
+    "verify": "npx hardhat verify --network sepolia 0x78Fb3DE034CbDF746e5e101a9C994321BCD4D25A"
   },
   "keywords": [],
   "author": "",
