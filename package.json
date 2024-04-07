@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "compile": "npx hardhat compile",
-    "test": "npx hardhat test ./test/MultisigWallet.js",
+    "test": "npx hardhat test ./test/MultisigWallet.test.ts",
     "server": "npx hardhat node",
     "watch": "nodemon --watch contracts --ext sol --exec 'npm run compile'",
     "deploy": "npx hardhat run ./scripts/deploy.ts --network sepolia",

@@ -6,7 +6,7 @@ contract TestContract {
     address public immutable msig;
 
     constructor(address _msig) {
-    msig = _msig;
+      msig = _msig;
     }
 
     modifier onlyMsig() {

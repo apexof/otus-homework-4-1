@@ -62,25 +62,8 @@ contract MultiSigWallet {
         require(success, "tx failed");
     }
 
-    function getTransaction(uint _txIndex)
-        public
-        view
-        returns (
-            address to,
-            uint value,
-            bytes memory data,
-            bool executed,
-            uint numConfirmations
-        )
-    {
+    function getTransaction(uint _txIndex) public view returns (Transaction memory){
         Transaction storage transaction = transactions[_txIndex];
-
-        return (
-            transaction.to,
-            transaction.value,
-            transaction.data,
-            transaction.executed,
-            transaction.numConfirmations
-        );
+        return transaction;        
     }
 }
