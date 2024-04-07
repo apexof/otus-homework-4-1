@@ -6,16 +6,12 @@ describe("MultiSigWallet", function () {
   let testContractAddr;
   let owner1;
   let owner2;
-  let owner3;
 
   beforeEach(async function () {
-    [owner1, owner2, owner3] = await ethers.getSigners();
+    [owner1, owner2] = await ethers.getSigners();
 
     const MultiSigWallet = await ethers.getContractFactory("MultiSigWallet");
-    multiSigWallet = await MultiSigWallet.deploy(
-      [owner1.address, owner2.address, owner3.address],
-      2 // numConfirmationsRequired
-    );
+    multiSigWallet = await MultiSigWallet.deploy(owner2.address);
     await multiSigWallet.waitForDeployment();
 
     const TestContract = await ethers.getContractFactory("TestContract");
