@@ -13,8 +13,6 @@ contract MultiSigWallet {
         uint numConfirmations;
     }
 
-    mapping(uint txIndex => mapping(address owner => bool isConfirmed)) public isConfirmed;
-
     Transaction[] public transactions;
 
     modifier onlyOwner() {
@@ -24,34 +22,29 @@ contract MultiSigWallet {
 
     constructor(address owner2) {
       isOwner[msg.sender] = true;
-      // owners.push(msg.sender);
       isOwner[owner2] = true;
-      // owners.push(owner2);        
     }
 
     receive() external payable {
     }
 
-    function submitTransaction(
-        address _to,
-        uint _value,
-        bytes memory _data
-    ) public onlyOwner {
-        transactions.push(
-            Transaction({
-                to: _to,
-                value: _value,
-                data: _data,
-                executed: false,
-                numConfirmations: 0
-            })
-        );
+    function addTransaction(address _to, uint _value, bytes memory _data) public onlyOwner returns(uint txIndex)  {
+      transactions.push(
+        Transaction({
+          to: _to,
+          value: _value,
+          data: _data,
+          executed: false,
+          numConfirmations: 0
+        })
+      );
+
+      return transactions.length - 1;
     }
 
     function confirmTransaction(uint _txIndex) public onlyOwner {
         Transaction storage transaction = transactions[_txIndex];
         transaction.numConfirmations += 1;
-        isConfirmed[_txIndex][msg.sender] = true;
     }
 
     function executeTransaction(uint _txIndex) public onlyOwner {
@@ -63,7 +56,6 @@ contract MultiSigWallet {
     }
 
     function getTransaction(uint _txIndex) public view returns (Transaction memory){
-        Transaction storage transaction = transactions[_txIndex];
-        return transaction;        
+        return transactions[_txIndex];        
     }
 }

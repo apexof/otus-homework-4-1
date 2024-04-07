@@ -11,7 +11,7 @@ describe("MultiSigWallet TS", function() {
     await multiSigWallet.waitForDeployment();
 
     const TestContract = await ethers.getContractFactory("TestContract");
-    const testContract = await TestContract.deploy(await multiSigWallet.getAddress());
+    const testContract = await TestContract.deploy();
     await testContract.waitForDeployment();
 
     return { owner1, owner2, multiSigWallet, testContract }
@@ -21,10 +21,9 @@ describe("MultiSigWallet TS", function() {
     const { testContract, owner1, owner2, multiSigWallet} = await loadFixture(deploy);
     const testContractAddr = await testContract.getAddress()
     const data = testContract.interface.encodeFunctionData("callMe", [123]);
-
-    await multiSigWallet.submitTransaction(testContractAddr, 0, data);
-
-    const txIndex = 0;
+    
+    const {value: txIndex} = await multiSigWallet.addTransaction(testContractAddr, 0, data);
+   
     const tx = await multiSigWallet.getTransaction(txIndex);
 
     expect(tx.to).to.equal(testContractAddr);
