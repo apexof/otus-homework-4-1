@@ -13,12 +13,6 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 200
       },
-      // outputSelection: {
-      //   "*": {
-      //   "": ["ast"],
-      //   "*": ["abi", "metadata", "devdoc", "userdoc", "storageLayout", "evm.legacyAssembly", "evm.bytecode", "evm.deployedBytecode", "evm.methodIdentifiers", "evm.gasEstimates", "evm.assembly"]
-      //   }
-      // }
     }
   },
   networks: {

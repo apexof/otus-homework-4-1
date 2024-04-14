@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.23;
 
 contract MultiSigWallet {
     mapping(address user => bool isOwner) public isOwner;

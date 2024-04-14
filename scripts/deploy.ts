@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const contractFactory = await ethers.getContractFactory("AccessControl");
+  const contractFactory = await ethers.getContractFactory("MultisigWallet");
   const contract = await contractFactory.deploy();
 
   await contract.waitForDeployment();
